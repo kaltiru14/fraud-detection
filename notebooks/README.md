@@ -195,3 +195,68 @@ pip install -r requirements.txt
 *   Extract reusable functions into standalone Python scripts for full pipeline automation
     
 *   Implement basic **error handling and logging** for production readiness
+
+## Task 2: Model Building & Training
+
+In this task, we built, trained, and evaluated classification models to detect fraudulent transactions for both e-commerce and bank datasets. Special attention was given to handling class imbalance and selecting appropriate evaluation metrics.
+
+### 1. Data Preparation
+- Used processed train/test datasets:
+  - E-commerce: `fraud_X_train`, `fraud_X_test`, `fraud_y_train`, `fraud_y_test`
+  - Bank Credit: `credit_X_train`, `credit_X_test`, `credit_y_train`, `credit_y_test`
+- Stratified splits preserved class distribution.
+
+### 2. Baseline Model: Logistic Regression
+- Trained with `class_weight='balanced'`.
+- **Fraud Data (E-commerce)**:
+  - F1-Score: 0.671
+  - PR-AUC: 0.579
+  - Confusion Matrix:  
+    ```
+    [[23120   256]
+     [ 1087  1367]]
+    ```
+- **Credit Data**:
+  - F1-Score: 0.233
+  - PR-AUC: 0.759
+
+### 3. Ensemble Model: Random Forest
+- Trained with `n_estimators=200`, `max_depth=10`, `class_weight='balanced'`.
+- **Fraud Data (E-commerce)**:
+  - F1-Score: 0.698
+  - PR-AUC: 0.645
+  - Confusion Matrix:  
+    ```
+    [[23306    70]
+     [ 1101  1353]]
+    ```
+- **Credit Data**:
+  - F1-Score: 0.670
+  - PR-AUC: 0.796
+  - Confusion Matrix:  
+    ```
+    [[56593    58]
+     [   18    77]]
+    ```
+- **Top 10 Features (Fraud Data)**:  
+  `short_account`, `time_since_signup`, `country_United States`, `age`, `sex_M`, `purchase_velocity`, `source_Direct`, `purchase_value`, `source_SEO`, `country_China`
+
+### 4. Cross-Validation (Fraud Data)
+- Stratified 5-fold CV F1 scores:
+  - Logistic Regression: 0.855 ± 0.001
+  - Random Forest: 0.723 ± 0.003
+
+### 5. Model Comparison
+| Model                | F1     | PR-AUC |
+|----------------------|--------|--------|
+| Logistic Regression  | 0.671  | 0.579  |
+| Random Forest        | 0.698  | 0.645  |
+
+**Observations:**  
+- Random Forest outperformed Logistic Regression on both datasets, capturing complex patterns while handling class imbalance.  
+- Logistic Regression provides interpretability, while Random Forest offers higher predictive power.  
+
+### 6. Key Challenges
+- **Class Imbalance:** Mitigated with `class_weight='balanced'` and appropriate metrics (F1, PR-AUC).  
+- **Feature Relevance:** Evaluated using Random Forest feature importances.  
+- **Interpretability vs Performance:** Logistic Regression offers transparency; Random Forest improves predictive performance.
