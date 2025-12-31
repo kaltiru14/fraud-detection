@@ -260,3 +260,111 @@ In this task, we built, trained, and evaluated classification models to detect f
 - **Class Imbalance:** Mitigated with `class_weight='balanced'` and appropriate metrics (F1, PR-AUC).  
 - **Feature Relevance:** Evaluated using Random Forest feature importances.  
 - **Interpretability vs Performance:** Logistic Regression offers transparency; Random Forest improves predictive performance.
+
+# Task 3 – Model Explainability
+
+## 1. Objective
+The goal of Task 3 is to **interpret the predictions of the best-performing ensemble models** (Random Forest) using SHAP, identify the key drivers of fraud, and provide actionable business recommendations. This ensures that fraud detection models are not only accurate but also explainable for stakeholders.
+
+---
+
+## 2. SHAP Analysis – Fraud Dataset
+
+### 2.1 Feature Importance (Top 10 Features)
+
+| Feature                | Importance |
+|------------------------|------------|
+| time_since_signup       | 0.2636     |
+| short_account           | 0.1716     |
+| age                     | 0.0834     |
+| purchase_value          | 0.0752     |
+| purchase_velocity       | 0.0748     |
+| hour_of_day             | 0.0674     |
+| day_of_week             | 0.0374     |
+| country_United States   | 0.0278     |
+| country_China           | 0.0138     |
+| source_SEO              | 0.0112     |
+
+**Interpretation:**  
+- New accounts (`time_since_signup`, `short_account`) are the strongest predictors of fraud.  
+- Temporal features (`hour_of_day`, `day_of_week`) capture time-dependent patterns.  
+- Geographic signals highlight higher-risk countries.
+
+### 2.2 Global SHAP Summary Plots
+- Summary plots visually confirm the feature importance ranking.  
+- Features like `time_since_signup` and `purchase_value` show clear positive or negative contributions to fraud risk.
+
+### 2.3 Local Explanations – Force Plots
+- **True Positive (TP):** Correctly flagged fraud; high `purchase_value` and short account history.  
+- **False Positive (FP):** Legitimate transaction flagged due to unusually high velocity.  
+- **False Negative (FN):** Missed fraud due to borderline feature values (moderate `purchase_value` and account age).
+
+---
+
+## 3. SHAP Analysis – Credit Dataset
+
+### 3.1 Feature Importance (Top 10 Features)
+
+| Feature  | Importance |
+|----------|------------|
+| V14      | 0.234      |
+| V10      | 0.156      |
+| V17      | 0.111      |
+| V12      | 0.091      |
+| V4       | 0.086      |
+| V3       | 0.059      |
+| V11      | 0.048      |
+| V2       | 0.047      |
+| V16      | 0.030      |
+| V7       | 0.024      |
+
+**Interpretation:**  
+- Top PCA-transformed features are the main drivers of predictions.  
+- SHAP summary and force plots highlight TP, FP, FN cases for deeper understanding of misclassifications.
+
+---
+
+## 4. Interpretation and Insights
+
+**Top Fraud Drivers (Fraud Dataset):**  
+1. `time_since_signup`  
+2. `short_account`  
+3. `purchase_value`  
+4. `purchase_velocity`  
+5. `hour_of_day`  
+
+**Surprising/Counterintuitive Findings:**  
+- Some legitimate transactions triggered false positives due to high transaction velocity.  
+- Certain high-value new accounts were correctly flagged, indicating the model captures risk patterns not obvious from simple thresholds.
+
+---
+
+## 5. Business Recommendations
+
+1. **Enhanced Verification for New Accounts:**  
+   - Transactions occurring within 24 hours of signup or from short-lived accounts should undergo additional checks.  
+   - SHAP insight: High `time_since_signup` and `short_account` values strongly increase fraud risk.  
+
+2. **Time-Based Risk Monitoring:**  
+   - Monitor high-risk hours; apply stricter checks during peak fraud activity.  
+   - SHAP insight: `hour_of_day` and `day_of_week` show time-dependent fraud patterns.  
+
+3. **Velocity-Based Alerts:**  
+   - Flag users with unusually high purchase velocity across multiple transactions.  
+   - SHAP insight: `purchase_velocity` significantly drives predictions.  
+
+4. **Geographic Risk Assessment:**  
+   - Transactions from high-risk countries should be verified more strictly.  
+   - SHAP insight: Country features (e.g., `United States`, `China`) influence risk scoring.  
+
+5. **Feature-Driven Thresholds:**  
+   - Combine top SHAP features to set dynamic risk thresholds rather than static rules, improving precision without reducing sensitivity.
+
+---
+
+## 6. Conclusion
+Task 3 successfully demonstrates **model explainability**:  
+- Random Forest predictions are interpretable via SHAP.  
+- Key drivers of fraud are identified and visualized.  
+- Actionable recommendations link model insights to business strategy, allowing proactive fraud prevention.  
+- SHAP analysis complements the feature importance from Task 2, providing both **global and local interpretability**.
